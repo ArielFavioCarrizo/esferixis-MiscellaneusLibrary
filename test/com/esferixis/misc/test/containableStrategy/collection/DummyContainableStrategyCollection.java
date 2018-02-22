@@ -29,31 +29,61 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.map;
+package com.esferixis.misc.test.containableStrategy.collection;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import java.util.Collection;
+import java.util.Iterator;
 
-import com.esferixis.misc.containableStrategy.DummyContainable;
-import com.esferixis.misc.containablestrategy.map.ContainableStrategyMap;
-import com.esferixis.misc.containablestrategy.map.WeakCachedHashExplicitContainableStrategyMap;
+import com.esferixis.misc.containablestrategy.ContainableStrategy;
+import com.esferixis.misc.containablestrategy.collection.AbstractContainableStrategyCollection;
 
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses( { ContainableStrategyIsolatedMapTest.class, ImplementationsConsistencyStochasticMapTest.class } )
-public class ContainableStrategyMapTests {
-	static final TestContainableStrategyMapFactory[] containableStrategyMapFactories = {
-		new TestContainableStrategyMapFactory(){
-			@Override
-			public ContainableStrategyMap<DummyContainable, Object> create() {
-				return new DummyContainableStrategyMap<DummyContainable, Object>(keyContainableStrategy);
-			}
-		},
-		new TestContainableStrategyMapFactory(){
-			@Override
-			public ContainableStrategyMap<DummyContainable, Object> create() {
-				return new WeakCachedHashExplicitContainableStrategyMap<DummyContainable, Object>(keyContainableStrategy);
-			}
+/**
+ * 
+ * Colección usada para hacer pruebas sobre la colección abstracta desde la estrategia de contenibles
+ * 
+ * @param <T>
+ */
+abstract class DummyContainableStrategyCollection<T> extends AbstractContainableStrategyCollection<T> {
+	private final Collection<T> testElementsCollection;
+	
+	/**
+	 * @pre La estrategia de contenibles y la colección no pueden ser nulos
+	 * @post Crea la colección de estrategia de prueba con la colección de elementos especificada
+	 * @param containableStrategy
+	 */
+	public DummyContainableStrategyCollection(
+			ContainableStrategy containableStrategy, Collection<T> testElementsCollection) {
+		super(containableStrategy);
+		if ( testElementsCollection != null ) {
+			this.testElementsCollection = testElementsCollection;
 		}
-	};
+		else {
+			throw new NullPointerException();
+		}
+	}
+
+	/**
+	 * @post Agrega el elemento especificado
+	 */
+	@Override
+	public boolean add(T element) {
+		return this.testElementsCollection.add(element);
+	}
+	
+	/**
+	 * @post Devuelve el iterador de elementos
+	 */
+	@Override
+	public Iterator<T> iterator() {
+		return this.testElementsCollection.iterator();
+	}
+
+	/**
+	 * @post Devuelve la cantidad de elementos
+	 */
+	@Override
+	public int size() {
+		return this.testElementsCollection.size();
+	}
+
 }

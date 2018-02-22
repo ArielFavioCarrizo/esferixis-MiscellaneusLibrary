@@ -29,49 +29,26 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.map;
+package com.esferixis.misc.test.containableStrategy.collection;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.Collection;
 
 import com.esferixis.misc.containablestrategy.ContainableStrategy;
-import com.esferixis.misc.containablestrategy.map.AbstractContainableStrategyMap;
+import com.esferixis.misc.containablestrategy.collection.FastRootElementsAccess;
 
 /**
- * Mapa de prueba desde la estrategia de contenibles
+ * Colección usada para hacer pruebas sobre la colección abstracta desde la estrategia de contenibles
+ *
+ * Ésta versión tiene una colección de elementos raices "rápida"
  * 
- * @param <K>
- * @param <V>
+ * @param <T>
  */
-class DummyContainableStrategyMap<K, V> extends AbstractContainableStrategyMap<K, V> {
-	private Map<K, V> backingMap;
-	
-	/**
-	 * @pre La estrategia de contenibles no puede ser nula
-	 * @post Crea el mapa de pruebas con la estrategia de contenibles de clave especificada
-	 * @param keyContainableStrategy
-	 */
-	public DummyContainableStrategyMap(
-			ContainableStrategy keyContainableStrategy) {
-		super(keyContainableStrategy);
-		this.backingMap = new HashMap<K, V>();
+public class FastRootDummyContainableStrategyCollection<T> extends DummyContainableStrategyCollection<T> implements FastRootElementsAccess {
+
+	public FastRootDummyContainableStrategyCollection(
+			ContainableStrategy containableStrategy,
+			Collection<T> testElementsCollection) {
+		super(containableStrategy, testElementsCollection);
 	}
 
-	/**
-	 * @post Devuelve el conjunto de elementos
-	 */
-	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return this.backingMap.entrySet();
-	}
-	
-	/**
-	 * @post Asigna la clave y el valor especificados
-	 */
-	@Override
-	public V put(K key, V value) {
-		return this.backingMap.put(key, value);
-	}
 }

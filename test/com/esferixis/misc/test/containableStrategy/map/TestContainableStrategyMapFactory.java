@@ -29,23 +29,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.collection;
+package com.esferixis.misc.test.containableStrategy.map;
 
-import java.util.Collection;
-
-import com.esferixis.misc.containablestrategy.ContainableStrategy;
+import com.esferixis.misc.containablestrategy.ExplicitContainableStrategy;
+import com.esferixis.misc.containablestrategy.map.ContainableStrategyMap;
+import com.esferixis.misc.test.containableStrategy.DummyContainable;
+import com.esferixis.misc.test.containableStrategy.DummyContainableStrategy;
 
 /**
- * Colección usada para hacer pruebas sobre la colección abstracta desde la estrategia de contenibles
- * 
- * Ésta versión tiene una colección de elementos raices lenta
+ * Fábrica de mapa basado en estrategia de contenibles para pruebas de JUnit
  */
-public class SlowRootDummyContainableStrategyCollection<T> extends DummyContainableStrategyCollection<T> {
-
-	public SlowRootDummyContainableStrategyCollection(
-			ContainableStrategy containableStrategy,
-			Collection<T> testElementsCollection) {
-		super(containableStrategy, testElementsCollection);
-	}
-
+public abstract class TestContainableStrategyMapFactory {
+	protected static final ExplicitContainableStrategy<DummyContainable> keyContainableStrategy = new DummyContainableStrategy();
+	
+	/**
+	 * @post Crea el mapa basado en estrategia de contenibles para pruebas
+	 */
+	public abstract ContainableStrategyMap<DummyContainable, Object> create();
 }

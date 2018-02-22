@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.map;
+package com.esferixis.misc.test.containableStrategy.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,9 +45,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.esferixis.misc.containableStrategy.DummyContainable;
 import com.esferixis.misc.containablestrategy.map.ContainableStrategyMap;
 import com.esferixis.misc.containablestrategy.map.WeakCachedHashExplicitContainableStrategyMap;
+import com.esferixis.misc.test.containableStrategy.DummyContainable;
 
 
 @RunWith(Parameterized.class)
