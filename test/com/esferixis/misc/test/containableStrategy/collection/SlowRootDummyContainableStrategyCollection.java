@@ -29,61 +29,23 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.collection;
+package com.esferixis.misc.test.containableStrategy.collection;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.esferixis.misc.containablestrategy.ContainableStrategy;
-import com.esferixis.misc.containablestrategy.collection.AbstractContainableStrategyCollection;
 
 /**
- * 
  * Colección usada para hacer pruebas sobre la colección abstracta desde la estrategia de contenibles
  * 
- * @param <T>
+ * Ésta versión tiene una colección de elementos raices lenta
  */
-abstract class DummyContainableStrategyCollection<T> extends AbstractContainableStrategyCollection<T> {
-	private final Collection<T> testElementsCollection;
-	
-	/**
-	 * @pre La estrategia de contenibles y la colección no pueden ser nulos
-	 * @post Crea la colección de estrategia de prueba con la colección de elementos especificada
-	 * @param containableStrategy
-	 */
-	public DummyContainableStrategyCollection(
-			ContainableStrategy containableStrategy, Collection<T> testElementsCollection) {
-		super(containableStrategy);
-		if ( testElementsCollection != null ) {
-			this.testElementsCollection = testElementsCollection;
-		}
-		else {
-			throw new NullPointerException();
-		}
-	}
+public class SlowRootDummyContainableStrategyCollection<T> extends DummyContainableStrategyCollection<T> {
 
-	/**
-	 * @post Agrega el elemento especificado
-	 */
-	@Override
-	public boolean add(T element) {
-		return this.testElementsCollection.add(element);
-	}
-	
-	/**
-	 * @post Devuelve el iterador de elementos
-	 */
-	@Override
-	public Iterator<T> iterator() {
-		return this.testElementsCollection.iterator();
-	}
-
-	/**
-	 * @post Devuelve la cantidad de elementos
-	 */
-	@Override
-	public int size() {
-		return this.testElementsCollection.size();
+	public SlowRootDummyContainableStrategyCollection(
+			ContainableStrategy containableStrategy,
+			Collection<T> testElementsCollection) {
+		super(containableStrategy, testElementsCollection);
 	}
 
 }

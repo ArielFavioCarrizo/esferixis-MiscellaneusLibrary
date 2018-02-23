@@ -29,26 +29,30 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.collection;
+package com.esferixis.misc.test.containableStrategy;
 
-import java.util.Collection;
+import java.util.Set;
 
-import com.esferixis.misc.containablestrategy.ContainableStrategy;
-import com.esferixis.misc.containablestrategy.collection.FastRootElementsAccess;
+import com.esferixis.misc.containablestrategy.ExplicitContainableStrategy;
 
 /**
- * Colección usada para hacer pruebas sobre la colección abstracta desde la estrategia de contenibles
- *
- * Ésta versión tiene una colección de elementos raices "rápida"
- * 
- * @param <T>
+ * Estrategia de contenibles para pruebas de JUnit de colecciones desde la estrategia de contenibles
  */
-public class FastRootDummyContainableStrategyCollection<T> extends DummyContainableStrategyCollection<T> implements FastRootElementsAccess {
+public class DummyContainableStrategy extends ExplicitContainableStrategy<DummyContainable> {
 
-	public FastRootDummyContainableStrategyCollection(
-			ContainableStrategy containableStrategy,
-			Collection<T> testElementsCollection) {
-		super(containableStrategy, testElementsCollection);
+	/**
+	 * @post Crea la estrategia de contenibles de prueba
+	 */
+	public DummyContainableStrategy() {
+		super(DummyContainable.class);
 	}
 
+	/**
+	 * @post Devuelve los contenedores
+	 */
+	@Override
+	public Set<DummyContainable> getContainers(DummyContainable containable) {
+		return containable.containers();
+	}
+	
 }

@@ -29,30 +29,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy;
+package com.esferixis.misc.test.containableStrategy.collection;
 
-import java.util.Set;
-
-import com.esferixis.misc.containablestrategy.ExplicitContainableStrategy;
+import com.esferixis.misc.containablestrategy.ContainableStrategy;
+import com.esferixis.misc.containablestrategy.collection.ContainableStrategyCollection;
+import com.esferixis.misc.test.containableStrategy.DummyContainable;
+import com.esferixis.misc.test.containableStrategy.DummyContainableStrategy;
 
 /**
- * Estrategia de contenibles para pruebas de JUnit de colecciones desde la estrategia de contenibles
+ * Fábrica de colección basada en estrategia de contenibles para pruebas de JUnit
  */
-public class DummyContainableStrategy extends ExplicitContainableStrategy<DummyContainable> {
-
-	/**
-	 * @post Crea la estrategia de contenibles de prueba
-	 */
-	public DummyContainableStrategy() {
-		super(DummyContainable.class);
-	}
-
-	/**
-	 * @post Devuelve los contenedores
-	 */
-	@Override
-	public Set<DummyContainable> getContainers(DummyContainable containable) {
-		return containable.containers();
-	}
+public abstract class TestContainableStrategyCollectionFactory {
+	protected static final ContainableStrategy containableStrategy = new DummyContainableStrategy();
 	
+	/**
+	 * @post Crea la colección basada en estrategia de contenibles para pruebas
+	 */
+	public abstract ContainableStrategyCollection<DummyContainable> create();
 }

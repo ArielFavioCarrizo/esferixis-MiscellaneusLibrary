@@ -29,21 +29,52 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.collection;
+package com.esferixis.misc.test.containableStrategy.collection;
 
-import com.esferixis.misc.containableStrategy.DummyContainable;
-import com.esferixis.misc.containableStrategy.DummyContainableStrategy;
-import com.esferixis.misc.containablestrategy.ContainableStrategy;
+import java.util.LinkedList;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+import com.esferixis.misc.containablestrategy.collection.CollectionContainableStrategyCollection;
 import com.esferixis.misc.containablestrategy.collection.ContainableStrategyCollection;
+import com.esferixis.misc.test.containableStrategy.DummyContainable;
+
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses( { ContainableStrategyCollectionIsolatedTests.class } )
 
 /**
- * Fábrica de colección basada en estrategia de contenibles para pruebas de JUnit
+ * Pruebas en JUnit de la colección desde la estrategia de contenibles 
+ * @author ariel
+ *
  */
-public abstract class TestContainableStrategyCollectionFactory {
-	protected static final ContainableStrategy containableStrategy = new DummyContainableStrategy();
+public class ContainableStrategyCollectionTests {	
 	
-	/**
-	 * @post Crea la colección basada en estrategia de contenibles para pruebas
-	 */
-	public abstract ContainableStrategyCollection<DummyContainable> create();
+	static final TestContainableStrategyCollectionFactory[] containableStrategyCollectionFactories = {
+		new TestContainableStrategyCollectionFactory() {
+
+			@Override
+			public ContainableStrategyCollection<DummyContainable> create() {
+				return new SlowRootDummyContainableStrategyCollection<DummyContainable>( containableStrategy, new LinkedList<DummyContainable>() );
+			}
+			
+		},
+		new TestContainableStrategyCollectionFactory() {
+
+			@Override
+			public ContainableStrategyCollection<DummyContainable> create() {
+				return new FastRootDummyContainableStrategyCollection<DummyContainable>( containableStrategy, new LinkedList<DummyContainable>() );
+			}
+			
+		},
+		new TestContainableStrategyCollectionFactory() {
+
+			@Override
+			public ContainableStrategyCollection<DummyContainable> create() {
+				return new CollectionContainableStrategyCollection<DummyContainable>( containableStrategy, new LinkedList<DummyContainable>() );
+			}
+			
+		}
+	};
 }

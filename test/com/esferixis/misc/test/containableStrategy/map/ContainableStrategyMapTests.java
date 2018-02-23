@@ -29,21 +29,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.containableStrategy.map;
+package com.esferixis.misc.test.containableStrategy.map;
 
-import com.esferixis.misc.containableStrategy.DummyContainable;
-import com.esferixis.misc.containableStrategy.DummyContainableStrategy;
-import com.esferixis.misc.containablestrategy.ExplicitContainableStrategy;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
 import com.esferixis.misc.containablestrategy.map.ContainableStrategyMap;
+import com.esferixis.misc.containablestrategy.map.WeakCachedHashExplicitContainableStrategyMap;
+import com.esferixis.misc.test.containableStrategy.DummyContainable;
 
-/**
- * Fábrica de mapa basado en estrategia de contenibles para pruebas de JUnit
- */
-public abstract class TestContainableStrategyMapFactory {
-	protected static final ExplicitContainableStrategy<DummyContainable> keyContainableStrategy = new DummyContainableStrategy();
-	
-	/**
-	 * @post Crea el mapa basado en estrategia de contenibles para pruebas
-	 */
-	public abstract ContainableStrategyMap<DummyContainable, Object> create();
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses( { ContainableStrategyIsolatedMapTest.class, ImplementationsConsistencyStochasticMapTest.class } )
+public class ContainableStrategyMapTests {
+	static final TestContainableStrategyMapFactory[] containableStrategyMapFactories = {
+		new TestContainableStrategyMapFactory(){
+			@Override
+			public ContainableStrategyMap<DummyContainable, Object> create() {
+				return new DummyContainableStrategyMap<DummyContainable, Object>(keyContainableStrategy);
+			}
+		},
+		new TestContainableStrategyMapFactory(){
+			@Override
+			public ContainableStrategyMap<DummyContainable, Object> create() {
+				return new WeakCachedHashExplicitContainableStrategyMap<DummyContainable, Object>(keyContainableStrategy);
+			}
+		}
+	};
 }
