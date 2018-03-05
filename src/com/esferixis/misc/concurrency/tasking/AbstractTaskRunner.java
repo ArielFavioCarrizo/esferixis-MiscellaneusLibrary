@@ -29,68 +29,33 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.concurrency.functional;
+package com.esferixis.misc.concurrency.tasking;
 
-import java.io.Serializable;
+import com.esferixis.misc.Preconditions;
 
 /**
- * Tarea para paradigma funcional
  * 
  * @author Ariel Favio Carrizo
- *
+ * 
+ * Ejecutador de tareas abstracto
  */
-public abstract class Task implements Serializable {
+public abstract class AbstractTaskRunner implements TaskRunner {
 	/**
+	 * @pre La tarea no puede ser nula
+	 * @post Ejecuta la tarea especificada
 	 * 
+	 * 		 Dependendiendo de la implementación, el runner de tarea puede
+	 * 		 ser el mismo u otro
 	 */
-	private static final long serialVersionUID = 2075330337289065621L;
-	
-	private float relativeRunningTime;
-	private boolean hasCalculatedRelativeSerialRunningTime;
-	
-	/**
-	 * @post Crea la tarea
-	 */
-	public Task() {
-		this.hasCalculatedRelativeSerialRunningTime = false;
-	}
-	
-	/**
-	 * @post Devuelve el tiempo que lleva estimado
-	 * 		 para ejecutarla
-	 */
-	public float getRelativeRunningTime() {
-		if ( !this.hasCalculatedRelativeSerialRunningTime ) {
-			this.relativeRunningTime = this.getRelativeRunningTime_implementation();
-			this.hasCalculatedRelativeSerialRunningTime = true;
-		}
+	public final void run(Task task) {
+		Preconditions.checkNotNull(task, "task");
 		
-		return this.relativeRunningTime;
+		this.run_checked(task);
 	}
 	
 	/**
-	 * @post Ejecuta la tarea con el ejecutador de
-	 * 		 tareas especificado
-	 * 
-	 * 		 Si la tarea va a dar un resultado,
-	 * 		 éste resultado tiene que ser procesado
-	 * 		 ejecutando subtareas con el ejecutador de tareas
-	 * 		 especificado
-	 * 
-	 * 		 Debe evitarse que una tarea reciba un objeto mutable
-	 * 		 provisto por la tarea padre.
-	 * 		 Salvo que englobe immutabilidad con estado definido
-	 * 		 diferido
+	 * @pre La tarea no es nula
+	 * @post Ejecuta la tarea especificada
 	 */
-	public abstract void run(TaskRunner taskRunner);
-	
-	/**
-	 * @post Devuelve el tiempo que lleva estimado
-	 * 		 para ejecutarla (Implementación)
-	 * 
-	 * 		 Sólo involucra ésta tarea en particular, no involucra
-	 * 		 a las subtareas que pueda ocasionar la ejecución
-	 * 		 de ésta tarea
-	 */
-	protected abstract float getRelativeRunningTime_implementation();
+	protected abstract void run_checked(Task task);
 }

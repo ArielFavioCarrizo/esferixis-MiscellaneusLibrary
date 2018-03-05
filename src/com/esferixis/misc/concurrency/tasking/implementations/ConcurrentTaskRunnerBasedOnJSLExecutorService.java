@@ -29,20 +29,59 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.concurrency.functional;
+package com.esferixis.misc.concurrency.tasking.implementations;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import com.esferixis.misc.concurrency.Shutdownable;
+import com.esferixis.misc.concurrency.tasking.AbstractTaskRunner;
+import com.esferixis.misc.concurrency.tasking.Task;
+import com.esferixis.misc.concurrency.tasking.TaskRunner;
 
 /**
- * Ejecutador de tareas
- * 
  * @author Ariel Favio Carrizo
- *
+ * 
+ * Ejecutador de tareas concurrente basado en ejecutador de tareas
+ * del Java Standard Library
  */
-public interface TaskRunner {
+public final class ConcurrentTaskRunnerBasedOnJSLExecutorService extends AbstractTaskRunner implements Shutdownable {
+	private final ExecutorService executor;
+	
 	/**
-	 * @post Ejecuta la tarea especificada
-	 * 
-	 * 		 Dependendiendo de la implementación, el runner de tarea puede
-	 * 		 ser el mismo u otro
+	 * @post Crea el ejecutador de tareas
 	 */
-	public void run(Task task);
+	public ConcurrentTaskRunnerBasedOnJSLExecutorService() {
+		this.executor = Executors.newWorkStealingPool();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.esferixis.misc.concurrency.tasking.AbstractTaskRunner#run_checked(com.esferixis.misc.concurrency.functional.Task)
+	 */
+	@Override
+	protected void run_checked(final Task task) {	
+		this.executor.execute( TaskRunnerUtil.createRunnable(this, task) );
+	}
+
+	/* (non-Javadoc)
+	 * @see com.esferixis.misc.concurrency.Shutdownable#shutdown()
+	 */
+	@Override
+	public void shutdown() {
+		this.executor.shutdown();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.esferixis.misc.concurrency.Shutdownable#lockThisThreadUntilHasBeenShutdown()
+	 */
+	@Override
+	public void lockThisThreadUntilHasBeenShutdown() {
+		try {
+			while ( !this.executor.awaitTermination(10, TimeUnit.SECONDS ) ) {}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }
