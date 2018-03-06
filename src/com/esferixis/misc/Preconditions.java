@@ -64,4 +64,18 @@ public final class Preconditions {
 			throw new NullPointerException("Expected non null argumentName");
 		}
 	}
+	
+	/**
+	 * @post Verifica que el número no es negativo
+	 */
+	public static void checkIsNotNegative(long number, String argumentName) {
+		if ( argumentName != null ) {
+			if ( number < 0 ) {
+				throw new NullPointerException("Expected non negative '" + argumentName + "'");
+			}
+		}
+		else {
+			throw new NullPointerException("Expected non null argumentName");
+		}
+	}
 }

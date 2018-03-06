@@ -36,9 +36,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.esferixis.misc.concurrency.Shutdownable;
-import com.esferixis.misc.concurrency.tasking.AbstractTaskRunner;
-import com.esferixis.misc.concurrency.tasking.Task;
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.concurrency.tasking.Task;
 
 /**
  * @author Ariel Favio Carrizo
@@ -46,7 +45,7 @@ import com.esferixis.misc.concurrency.tasking.TaskRunner;
  * Ejecutador de tareas concurrente basado en ejecutador de tareas
  * del Java Standard Library
  */
-public final class ConcurrentTaskRunnerBasedOnJSLExecutorService extends AbstractTaskRunner implements Shutdownable {
+public final class ConcurrentTaskRunnerBasedOnJSLExecutorService extends TaskRunner implements Shutdownable {
 	private final ExecutorService executor;
 	
 	/**

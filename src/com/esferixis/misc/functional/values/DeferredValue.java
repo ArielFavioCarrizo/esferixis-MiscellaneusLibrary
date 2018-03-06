@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.functional;
+package com.esferixis.misc.functional.values;
 
 import java.util.Optional;
 import java.util.Stack;
@@ -37,6 +37,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.functional.Consumer;
 
 /**
  * @author Ariel Favio Carrizo
@@ -48,15 +49,26 @@ public final class DeferredValue<T> implements Value<T> {
 	private final Stack<Consumer<T>> pendingConsumers;
 	
 	private Lock stateLock;
-
 	
 	/**
-	 * @post Crea un valor diferido
+	 * @post Crea un valor diferido con el consumidor del consumidor que
+	 * 		 que inicializa el valor y el ejecutador de tareas especificado
 	 */
-	private DeferredValue() {
+	public DeferredValue(Consumer<Consumer<T>> consumerOfValueInitializerConsumer, TaskRunner taskRunner) {
 		this.pendingConsumers = new Stack<Consumer<T>>();
 		this.settedValue = Optional.empty();
 		this.stateLock = new ReentrantLock();
+		
+		final DeferredValue<T> thisDeferredValue = this;
+		
+		consumerOfValueInitializerConsumer.accept(new Consumer<T>() {
+
+			@Override
+			public void accept(T value, TaskRunner taskRunner) {
+				thisDeferredValue.set(value, taskRunner);
+			}
+			
+		}, taskRunner);
 	}
 	
 	/**
@@ -64,7 +76,7 @@ public final class DeferredValue<T> implements Value<T> {
 	 * @post Setea un valor con el valor
 	 * 		 y el ejecutador de tareas especificado
 	 */
-	public void set(T value, TaskRunner taskRunner) {
+	private void set(T value, TaskRunner taskRunner) {
 		this.stateLock.lock();
 		
 		try {

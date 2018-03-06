@@ -68,6 +68,20 @@ public final class TaskRunnerUtil {
 	}
 	
 	/**
+	 * @post Realiza la composición de task runners
+	 */
+	public static TaskRunner compose(final TaskRunner outer, final TaskRunner inner) {
+		return new TaskRunner() {
+
+			@Override
+			public void run_checked(Task task) {
+				outer.run( TaskRunnerUtil.decorate(inner, task) );
+			}
+			
+		};
+	}
+	
+	/**
 	 * @post Crea un runnable para ésta tarea, que
 	 * 		 ejecuta la tarea con el task runner especificado
 	 */

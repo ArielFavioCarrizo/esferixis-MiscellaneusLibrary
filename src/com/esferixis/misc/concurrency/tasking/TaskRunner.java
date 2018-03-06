@@ -34,12 +34,19 @@ package com.esferixis.misc.concurrency.tasking;
 import com.esferixis.misc.Preconditions;
 
 /**
- * Ejecutador de tareas
  * 
  * @author Ariel Favio Carrizo
- *
+ * 
+ * Ejecutador de tareas abstracto
  */
-public abstract interface TaskRunner {
+public abstract class TaskRunner {
+	/**
+	 * @post Crea el corredor de tareas
+	 */
+	public TaskRunner() {
+		
+	}
+	
 	/**
 	 * @pre La tarea no puede ser nula
 	 * @post Ejecuta la tarea especificada
@@ -47,5 +54,15 @@ public abstract interface TaskRunner {
 	 * 		 Dependendiendo de la implementación, el runner de tarea puede
 	 * 		 ser el mismo u otro
 	 */
-	public void run(Task task);
+	public final void run(Task task) {
+		Preconditions.checkNotNull(task, "task");
+		
+		this.run_checked(task);
+	}
+	
+	/**
+	 * @pre La tarea no es nula
+	 * @post Ejecuta la tarea especificada
+	 */
+	protected abstract void run_checked(Task task);
 }

@@ -32,9 +32,8 @@
 package com.esferixis.misc.concurrency.tasking.implementations;
 
 import com.esferixis.misc.Preconditions;
-import com.esferixis.misc.concurrency.tasking.AbstractTaskRunner;
-import com.esferixis.misc.concurrency.tasking.Task;
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.concurrency.tasking.Task;
 
 /**
  * @author Ariel Favio Carrizo
@@ -42,12 +41,12 @@ import com.esferixis.misc.concurrency.tasking.TaskRunner;
  *		   Ejecutador de tareas recursivo,
  *		   
  */
-public final class ThresholdedRecursiveTaskRunner extends AbstractTaskRunner {
+public final class ThresholdedRecursiveTaskRunner extends TaskRunner {
 	private final TaskRunner criticalConditionTaskRunner;
 	private final TaskRunner lowerTaskRunner;
 	
-	private long recursionLevelLimit;
-	private long recursionLevel;
+	private final long recursionLevelLimit;
+	private final long recursionLevel;
 	
 	/**
 	 * @pre Ninguno de los ejecutadores de tareas provistos pueden ser nulos,
@@ -63,33 +62,53 @@ public final class ThresholdedRecursiveTaskRunner extends AbstractTaskRunner {
 	 * 		 tarea
 	 */
 	public ThresholdedRecursiveTaskRunner(TaskRunner criticalConditionTaskRunner, TaskRunner lowerTaskRunner, long recursionLevelLimit) {
+		this(criticalConditionTaskRunner, lowerTaskRunner, recursionLevelLimit, 0);
+	}
+	
+	/**
+	 * @pre Ninguno de los ejecutadores de tareas provistos pueden ser nulos,
+	 * 		y el límite de nivel de recursión tiene que ser positivo.
+	 * 
+	 * 		También, el nivel de recursividad no puede ser negativo
+	 * 
+	 * @post Crea un ejecutador de tareas recursivo
+	 * 		 con el ejecutador de tareas de condición crítica, el inferior, 
+	 * 		 el nivel de recursión límite, y el actual
+	 * 		 especificados.
+	 * 
+	 * 		 El ejecutador de tareas superior se ejecuta cuando el nivel
+	 * 		 de recursividad alcanza el valor crítico.
+	 * 		 
+	 * 		 El ejecutador de tareas inferior se ejecuta por cada
+	 * 		 tarea
+	 */
+	private ThresholdedRecursiveTaskRunner(TaskRunner criticalConditionTaskRunner, TaskRunner lowerTaskRunner, long recursionLevelLimit, long recursionLevel) {
 		Preconditions.checkNotNull(criticalConditionTaskRunner, "upperTaskRunner");
 		Preconditions.checkNotNull(lowerTaskRunner, "lowerTaskRunner");
 		Preconditions.checkIsPositive(recursionLevelLimit, "recursionLevelLimit");
+		Preconditions.checkIsNotNegative(recursionLevel, "recursionLevel");
 		
 		this.criticalConditionTaskRunner = criticalConditionTaskRunner;
 		this.lowerTaskRunner = lowerTaskRunner;
 		this.recursionLevelLimit = recursionLevelLimit;
-		
-		this.recursionLevel = 0;
+		this.recursionLevel = recursionLevel;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.esferixis.misc.concurrency.tasking.AbstractTaskRunner#run_checked(com.esferixis.misc.concurrency.tasking.Task)
+	 * @see com.esferixis.misc.concurrency.tasking.TaskRunner#run_checked(com.esferixis.misc.concurrency.tasking.Task)
 	 */
 	@Override
 	protected void run_checked(Task task) {
-		final Task taskToExecute = TaskRunnerUtil.decorate(this.lowerTaskRunner, task);
+		final Task decoratedTask = TaskRunnerUtil.decorate(this.lowerTaskRunner, task);
+		final TaskRunner nextTaskRunner;
 		
 		if ( this.recursionLevel >= this.recursionLevelLimit ) {
-			this.recursionLevel = 0;
-			
-			this.criticalConditionTaskRunner.run(taskToExecute);
+			nextTaskRunner = TaskRunnerUtil.compose(this.criticalConditionTaskRunner, new ThresholdedRecursiveTaskRunner(this.criticalConditionTaskRunner, this.lowerTaskRunner, this.recursionLevelLimit) );
 		}
 		else {
-			taskToExecute.run(this);
-			
-			this.recursionLevel++;
+			nextTaskRunner = new ThresholdedRecursiveTaskRunner(this.criticalConditionTaskRunner, this.lowerTaskRunner, this.recursionLevelLimit, this.recursionLevel+1 );
 		}
+		
+		nextTaskRunner.run(decoratedTask);
 	}
 }

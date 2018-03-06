@@ -34,11 +34,8 @@ package com.esferixis.misc.concurrency.tasking.implementations;
 import java.util.function.Supplier;
 
 import com.esferixis.misc.Preconditions;
-import com.esferixis.misc.concurrency.ConcurrencyPreventer;
-import com.esferixis.misc.concurrency.tasking.AbstractTaskRunner;
-import com.esferixis.misc.concurrency.tasking.Task;
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
-import com.esferixis.misc.reference.DynamicReference;
+import com.esferixis.misc.concurrency.tasking.Task;
 
 /**
  * @author arifa
@@ -50,23 +47,22 @@ import com.esferixis.misc.reference.DynamicReference;
  * cubierto hasta asegurarse que haya alcanzado
  * un tiempo de ejecución relativo crítico
  */
-public final class AntioverheadFilterTaskRunnerDecorator extends AbstractTaskRunner {
+public final class AntioverheadFilterTaskRunnerDecorator extends TaskRunner {
 	private final TaskRunner upperTaskRunner;
 	private final Supplier<TaskRunner> lowerTaskRunnerSupplier;
 	
 	private final TaskRunner lowerTaskRunner;
 	
 	private final long relativeRunningTimeThreshold;
-	private DynamicReference<Long> relativeRunningTimeCount;
-	
-	private final ConcurrencyPreventer runningTaskConcurrencyPreventer;
+	private long accumulatedRelativeRunningTime;
 	
 	/**
 	 * @pre El ejecutador de tareas superior y la fábrica del ejecutador
 	 * 		tareas de capa inferior no pueden ser nulos
 	 * 		El threshold de tiempo de ejecución relativo no puede ser negativo
 	 * 
-	 * @post Crea el decorador con la tarea a decorar
+	 * @post Crea el decorador con el runner de tareas superior,
+	 * 		 el proveedor de runner de tarea inferior,
 	 * 		 y el threshold de tiempo de ejecución
 	 * 		 especificados
 	 */
@@ -80,47 +76,37 @@ public final class AntioverheadFilterTaskRunnerDecorator extends AbstractTaskRun
 		this.lowerTaskRunnerSupplier = lowerTaskRunnerSupplier;
 		this.lowerTaskRunner = this.lowerTaskRunnerSupplier.get();
 		
-		this.relativeRunningTimeThreshold = relativeRunningTimeThreshold;
-		this.relativeRunningTimeCount = new DynamicReference<Long>(0l);
-		
-		this.runningTaskConcurrencyPreventer = new ConcurrencyPreventer("Cannot run a task when it has already running someone");
+		this.relativeRunningTimeThreshold = 0;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.esferixis.misc.concurrency.tasking.AbstractTaskRunner#run_checked(com.esferixis.misc.concurrency.functional.Task)
+	 * @see com.esferixis.misc.concurrency.tasking.TaskRunner#run_checked(com.esferixis.misc.concurrency.functional.Task)
 	 */
 	@Override
 	protected void run_checked(final Task task) {
-		final AntioverheadFilterTaskRunnerDecorator thisTaskRunner = this;
+		long nextAccumulatedRelativeRunningTime = this.accumulatedRelativeRunningTime + task.getRelativeRunningTime();
+		final TaskRunner nextTaskRunner;
 		
-		this.runningTaskConcurrencyPreventer.run(new Runnable() {
-
-			@Override
-			public void run() {
-				long nextRelativeRunningTimeCount = thisTaskRunner.relativeRunningTimeCount.get() + task.getRelativeRunningTime();
-				
-				if ( nextRelativeRunningTimeCount > relativeRunningTimeThreshold ) {
-					thisTaskRunner.fork(task);
-					
-					nextRelativeRunningTimeCount = 0;
-				}
-				else {
-					thisTaskRunner.lowerTaskRunner.run(task);
-				}
-				
-				thisTaskRunner.relativeRunningTimeCount.set(nextRelativeRunningTimeCount);
-			}
-			
-		});
+		if ( nextAccumulatedRelativeRunningTime > relativeRunningTimeThreshold ) {
+			nextTaskRunner = this.fork();
+			nextAccumulatedRelativeRunningTime = 0;
+		}
+		else {
+			nextTaskRunner = TaskRunnerUtil.compose(this.lowerTaskRunner, this );
+		}
+		
+		this.accumulatedRelativeRunningTime = nextAccumulatedRelativeRunningTime;
+		
+		nextTaskRunner.run(task);
 	}
 
 	/**
-	 * @post Forkea el task runner ejecutando la tarea
-	 * 		 especificada
+	 * @post Forkea el task runner
 	 */
-	private void fork(final Task task) {
-		final TaskRunner forkedDecoratedTaskRunner = new AntioverheadFilterTaskRunnerDecorator(this.upperTaskRunner, this.lowerTaskRunnerSupplier, this.relativeRunningTimeThreshold);
-		
-		this.upperTaskRunner.run( TaskRunnerUtil.decorate(forkedDecoratedTaskRunner, task) );
+	private TaskRunner fork() {
+		return TaskRunnerUtil.compose(
+				new AntioverheadFilterTaskRunnerDecorator(this.upperTaskRunner, this.lowerTaskRunnerSupplier, this.relativeRunningTimeThreshold),
+				this.upperTaskRunner
+		);
 	}
 }

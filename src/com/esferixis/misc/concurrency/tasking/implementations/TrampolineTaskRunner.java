@@ -33,23 +33,25 @@ package com.esferixis.misc.concurrency.tasking.implementations;
 
 import java.util.Stack;
 
-import com.esferixis.misc.concurrency.tasking.AbstractTaskRunner;
-import com.esferixis.misc.concurrency.tasking.Task;
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.concurrency.tasking.Task;
 
 /**
  * @author Ariel Favio Carrizo
  *
  *		   Task runner basado en la técnica de Trampoline
  */
-public final class TrampolineTaskRunner extends AbstractTaskRunner {
-	private Stack<Runnable> runnablesToExecute;
+public final class TrampolineTaskRunner extends TaskRunner {
+	private Stack<Task> tasksToExecute;
+	private boolean inRunningLoop;
 	
 	/**
 	 * @post Crea el task runner
 	 */
 	public TrampolineTaskRunner() {
-		this.runnablesToExecute = new Stack<Runnable>();
+		this.tasksToExecute = new Stack<Task>();
+		
+		this.inRunningLoop = false;
 	}
 
 	/* (non-Javadoc)
@@ -57,7 +59,17 @@ public final class TrampolineTaskRunner extends AbstractTaskRunner {
 	 */
 	@Override
 	protected void run_checked(Task task) {
-		this.runnablesToExecute.push( TaskRunnerUtil.createRunnable(this, task) );
+		this.tasksToExecute.push(task);
+		
+		if ( !this.inRunningLoop ) {
+			this.inRunningLoop = true;
+			
+			while ( !this.tasksToExecute.empty() ) {
+				this.tasksToExecute.pop().run(this);
+			}
+
+			this.inRunningLoop = false;
+		}
 	}
 
 }

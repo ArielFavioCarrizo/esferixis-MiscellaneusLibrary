@@ -29,16 +29,19 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.concurrency.tasking;
+package com.esferixis.misc.functional.values;
 
-import com.esferixis.misc.concurrency.Shutdownable;
+import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.functional.Consumer;
 
 /**
  * @author Ariel Favio Carrizo
- * 
- * Ejecutador de tareas detenible
- *
  */
-public interface ShutdownableTaskRunner extends TaskRunner, Shutdownable {
-
+public interface Value<T> {
+	/**
+	 * @post Obtiene el valor en el consumidor
+	 * 		 especificado,
+	 * 		 con el ejecutador de tareas especificado
+	 */
+	public void get(Consumer<T> consumer, TaskRunner taskRunner);
 }

@@ -33,6 +33,8 @@ package com.esferixis.misc.concurrency.tasking;
 
 import java.io.Serializable;
 
+import com.esferixis.misc.concurrency.tasking.implementations.TaskRunnerUtil;
+
 /**
  * Tarea para paradigma funcional
  * 

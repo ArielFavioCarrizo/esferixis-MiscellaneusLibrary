@@ -29,33 +29,17 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.concurrency.tasking;
+package com.esferixis.misc.functional;
 
-import com.esferixis.misc.Preconditions;
+import com.esferixis.misc.functional.values.Value;
 
 /**
- * 
  * @author Ariel Favio Carrizo
- * 
- * Ejecutador de tareas abstracto
  */
-public abstract class AbstractTaskRunner implements TaskRunner {
+public interface Function<Input, Output> {
 	/**
-	 * @pre La tarea no puede ser nula
-	 * @post Ejecuta la tarea especificada
-	 * 
-	 * 		 Dependendiendo de la implementación, el runner de tarea puede
-	 * 		 ser el mismo u otro
+	 * @post Evalúa el valor especificado, devolviendo
+	 * 		 otro
 	 */
-	public final void run(Task task) {
-		Preconditions.checkNotNull(task, "task");
-		
-		this.run_checked(task);
-	}
-	
-	/**
-	 * @pre La tarea no es nula
-	 * @post Ejecuta la tarea especificada
-	 */
-	protected abstract void run_checked(Task task);
+	public Value<Output> evaluate(Value<Input> inputValue);
 }

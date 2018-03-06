@@ -29,18 +29,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.esferixis.misc.functional;
+package com.esferixis.misc.functional.values;
 
+import com.esferixis.misc.Preconditions;
 import com.esferixis.misc.concurrency.tasking.TaskRunner;
+import com.esferixis.misc.functional.Consumer;
 
 /**
+ * Valor inmediato
+ * 
  * @author Ariel Favio Carrizo
+ *
  */
-public interface Value<T> {
+public final class ImmediateValue<T> implements Value<T> {
+	private final T value;
+	
 	/**
-	 * @post Obtiene el valor en el consumidor
-	 * 		 especificado,
-	 * 		 con el ejecutador de tareas especificado
+	 * @pre El valor no puede ser nulo
+	 * @post Crea un valor inmediato con el valor especificado
 	 */
-	public void get(Consumer<T> consumer, TaskRunner taskRunner);
+	public ImmediateValue(T value) {
+		Preconditions.checkNotNull(value, "value");
+		
+		this.value = value;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.esferixis.misc.functional.values.Value#get(com.esferixis.misc.functional.Consumer, com.esferixis.misc.concurrency.tasking.TaskRunner)
+	 */
+	@Override
+	public void get(Consumer<T> consumer, TaskRunner taskRunner) {
+		consumer.accept(this.value, taskRunner);
+	}
 }
